@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 class EoraScraper:
     """
     Класс для парсинга данных с сайта EORA.
-    
+
     Позволяет извлекать текстовое содержимое страниц и сохранять
     результаты в JSON-файл для дальнейшего использования.
     """
@@ -24,10 +24,10 @@ class EoraScraper:
     def scrape_url(self, url):
         """
         Парсинг отдельной страницы по URL.
-        
+
         Извлекает текстовое содержимое страницы, удаляя ненужные элементы
         (скрипты, стили, навигацию и т.д.).
-        
+
         Args:
             url (str): URL страницы для парсинга.
         """
@@ -86,10 +86,10 @@ class EoraScraper:
     def scrape_specific_urls(self, urls):
         """
         Парсинг списка URL-адресов.
-        
+
         Args:
             urls (list): Список URL-адресов для парсинга.
-            
+
         Returns:
             list: Список извлеченных данных.
         """
@@ -105,6 +105,8 @@ class EoraScraper:
         Args:
             filename (str): Путь к файлу для сохранения данных.
         """
+        # Создает директорию, если она не существует
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         abs_path = os.path.abspath(filename)
         print(f"Saving data to: {abs_path}")
         with open(filename, 'w', encoding='utf-8') as f:
