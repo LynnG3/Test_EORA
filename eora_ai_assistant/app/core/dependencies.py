@@ -11,7 +11,7 @@ from app.services.ai_engine import AIEngine
 from app.core.config import settings
 
 # Инициализация AI Engine
-ai_engine = AIEngine(api_key=settings.OPENAI_API_KEY)
+ai_engine = AIEngine(use_local_llm=settings.USE_LOCAL_LLM)
 
 # Хранилище сессий
 sessions = {}

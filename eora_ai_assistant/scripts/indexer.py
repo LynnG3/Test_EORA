@@ -8,22 +8,19 @@ from app.services.scrapper import EoraScraper
 
 
 def main():
-    # Создает директорию для данных, если её нет
+    """Основная функция для создания индекса."""
     project_root = Path(__file__).parent.parent
 
-    # Создает директорию для данных в корне проекта
     data_dir = project_root / "data"
     data_dir.mkdir(exist_ok=True)
 
     # Путь к файлу с данными
     data_file = data_dir / "scraped_data.json"
 
-    # URLs для парсинга
+    # URLs для парсинга (будут автоматически обновляться)
     urls = [
-        "https://eora.ru/cases/promyshlennaya-bezopasnost",
-        "https://eora.ru/cases/lamoda-systema-segmentacii-i-poiska-po-pohozhey-odezhde",
-        "https://eora.ru/cases/ifarm-nejroset-dlya-ferm",
-        "https://eora.ru"
+        # URLs будут автоматически обновляться скриптом url_extractor.py
+        "https://eora.ru"  # Базовый URL как fallback
     ]
 
     # Парсит сайт

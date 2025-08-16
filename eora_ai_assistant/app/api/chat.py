@@ -1,3 +1,4 @@
+"""API эндпоинты для работы с чатом."""
 import uuid
 from typing import Optional, List, Dict
 
@@ -7,73 +8,65 @@ from pydantic import BaseModel
 from eora_ai_assistant.logger import logger
 from app.core.dependencies import ai_engine, sessions
 
-# Создание экземпляра APIRouter
+
 router = APIRouter(tags=["chat"])
 
 
 class MessageRequest(BaseModel):
-    """
-    Модель запроса для отправки сообщения.
+    """ Модель запроса для отправки сообщения. """
 
-    Attributes:
-        message (str): Текст сообщения от пользователя
-        session_id (str, optional): Идентификатор сессии для продолжения диалога
-    """
     message: str
     session_id: Optional[str] = None
 
 
 class SourceInfo(BaseModel):
-    """
-    Информация об источнике данных.
+    """Информация об источнике данных."""
 
-    Attributes:
-        url (str): URL источника
-        title (str): Заголовок источника
-    """
     url: str
     title: str
 
 
 class MessageResponse(BaseModel):
-    """
-    Модель ответа на сообщение пользователя.
-
-    Attributes:
-        session_id (str): Идентификатор сессии
-        message (str): Текст ответа ассистента
-        sources (List[Dict[str, str]]): Список использованных источников
-    """
+    """ Модель ответа на сообщение пользователя. """
     session_id: str
     message: str
     sources: List[Dict[str, str]]
 
 
-@router.post("/chat", response_model=MessageResponse)
-async def chat(request: MessageRequest):
-    """
-    Обработка сообщения пользователя и генерация ответа.
-
-    Args:
-        request (MessageRequest): Запрос с сообщением пользователя
-
-    Returns:
-        MessageResponse: Ответ ассистента с источниками
-
-    Raises:
-        HTTPException: При ошибке генерации ответа
-    """
-    # Создает или получает сессию
-    session_id = request.session_id or str(uuid.uuid4())
-    logger.info(f"Processing message for session {session_id}")
+def _get_or_create_session(session_id: Optional[str]) -> str:
+    """Создает или получает существующую сессию."""
+    if session_id is None:
+        session_id = str(uuid.uuid4())
+        logger.info(f"Created new session {session_id}")
 
     if session_id not in sessions:
         sessions[session_id] = []
-        logger.info(f"Created new session {session_id}")
 
-    # Сохраняет сообщение пользователя
-    sessions[session_id].append({"role": "user", "content": request.message})
-    logger.info(f"Added user message to session {session_id}")
+    return session_id
+
+
+def _add_message_to_session(
+        session_id: str,
+        role: str,
+        content: str,
+        sources: Optional[List] = None
+    ) -> None:
+    """Добавляет сообщение в сессию."""
+    message_data = {"role": role, "content": content}
+    if sources:
+        message_data["sources"] = sources
+
+    sessions[session_id].append(message_data)
+    logger.info(f"Added {role} message to session {session_id}")
+
+
+@router.post("/chat", response_model=MessageResponse)
+async def chat(request: MessageRequest):
+    """ Обработка сообщения пользователя и генерация ответа.  """
+    session_id = _get_or_create_session(request.session_id)
+    logger.info(f"Processing message for session {session_id}")
+
+    _add_message_to_session(session_id, "user", request.message)
 
     try:
         # Получает контекст и генерирует ответ
@@ -82,16 +75,18 @@ async def chat(request: MessageRequest):
         logger.info(f"Found {len(sources)} relevant sources")
 
         logger.info("Generating answer...")
-        ai_response, sources = await ai_engine.generate_answer(request.message, context, sources)
+        ai_response, sources = await ai_engine.generate_answer(
+            request.message,
+            context, sources
+        )
         logger.info("Answer generated successfully")
 
         # Сохраняет ответ ассистента
-        sessions[session_id].append({
-            "role": "assistant",
-            "content": ai_response,
-            "sources": sources
-        })
-        logger.info(f"Added assistant response to session {session_id}")
+        _add_message_to_session(
+            session_id,
+            "assistant",
+            ai_response, sources
+        )
 
         return MessageResponse(
             session_id=session_id,
@@ -101,29 +96,29 @@ async def chat(request: MessageRequest):
 
     except Exception as e:
         logger.exception(f"Error processing message: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate response: {str(e)}"
+        # Обобщенное сообщение об ошибке для пользователя
+        error_message = (
+            f"Произошла ошибка при обработке вашего запроса. "
+            f"Пожалуйста, попробуйте позже."
+        )
+        _add_message_to_session(session_id, "assistant", error_message)
+
+        return MessageResponse(
+            session_id=session_id,
+            message=error_message,
+            sources=[]
         )
 
 
 @router.get("/sessions/{session_id}")
 async def get_session(session_id: str):
-    """
-    Получение истории сообщений для указанной сессии.
-
-    Args:
-        session_id (str): Идентификатор сессии
-
-    Returns:
-        dict: Информация о сессии и истории сообщений
-
-    Raises:
-        HTTPException: Если сессия не найдена
-    """
+    """ Получение истории сообщений для указанной сессии. """
     logger.info(f"Retrieving session {session_id}")
     if session_id not in sessions:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    logger.info(f"Returning session {session_id} with {len(sessions[session_id])} messages")
+    logger.info(
+        f"Returning session {session_id} "
+        f"with {len(sessions[session_id])} messages"
+    )
     return {"session_id": session_id, "messages": sessions[session_id]}
