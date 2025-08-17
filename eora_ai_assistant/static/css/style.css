@@ -1,0 +1,155 @@
+/* Основные стили */
+:root {
+    --primary-color: #0066cc;
+    --secondary-color: #e3f2fd;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --border-color: #ddd;
+    --shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+/* Контейнер чата */
+.chat-container {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    height: 450px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    background-color: #fff;
+    box-shadow: var(--shadow);
+}
+
+/* Стили сообщений */
+.message {
+    margin-bottom: 12px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.user {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    margin-left: auto;
+    text-align: right;
+    border-bottom-right-radius: 2px;
+}
+
+.assistant {
+    background-color: #f1f1f1;
+    color: var(--text-color);
+    margin-right: auto;
+    border-bottom-left-radius: 2px;
+}
+
+/* Контейнер ввода */
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+#message-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#message-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(0, 102, 204, 0.3);
+}
+
+/* Кнопка отправки */
+button {
+    padding: 12px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0055aa;
+}
+
+button:active {
+    background-color: #004499;
+}
+
+/* Источники */
+.sources {
+    font-size: 0.8em;
+    margin-top: 8px;
+    color: #666;
+}
+
+.source-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    margin-right: 5px;
+    transition: color 0.3s;
+}
+
+.source-link:hover {
+    color: #004499;
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .message {
+        max-width: 90%;
+    }
+    
+    .input-container {
+        flex-direction: column;
+    }
+    
+    #message-input {
+        margin-bottom: 10px;
+    }
+    
+    button {
+        width: 100%;
+    }
+}

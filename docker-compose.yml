@@ -1,0 +1,24 @@
+services:
+  eora-ai-assistant:
+    build: .
+    container_name: eora-ai-assistant
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - huggingface-cache:/app/.cache/huggingface
+      - ./.env:/app/.env:ro
+    environment:
+      - PYTHONPATH=/app
+      - TOKENIZERS_PARALLELISM=false
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  huggingface-cache:
+    driver: local
