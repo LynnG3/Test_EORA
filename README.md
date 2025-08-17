@@ -1,7 +1,11 @@
 # EORA AI Assistant
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
+[![Python](https://img.shields.io/badge/python-3.8+-blue.svg?style=flat&logo=python)](https://www.python.org)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 
 ## Структура проекта
 
+```
 Test_EORA-1/
 ├── eora_ai_assistant/
 │   ├── app/
@@ -29,6 +33,7 @@ Test_EORA-1/
 │   └── run.py                       # Скрипт запуска
 ├── requirements.txt                  # Зависимости Python
 └── README.md                        # Документация
+```
 
 ## Ключевые возможности проекта
 
@@ -161,7 +166,7 @@ docker-compose up --build
 docker compose up --build
 ```
 
-## Основные технологии
+## Технологический стек
 
 1. Backend  
 - Python 3.11 - основной язык разработки
